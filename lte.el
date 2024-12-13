@@ -109,13 +109,16 @@
         (new-width (window-body-width win)))
     (when (and (equal new-width last-width1)
                (not (equal last-width1 last-width2)))
-      (lte--truncate-tables-in-region (window-start) (window-end)))
+      (with-selected-window win
+        (lte--truncate-tables-in-region (window-start) (window-end))))
     (setq-local lte--last-widths `(,new-width . ,last-width1))))
 
 (defun lte--truncate-after-org-indent (buf)
   "Truncate all tables in BUF after org-indent initialisation."
-  (with-current-buffer buf
-    (lte--truncate-tables-in-region (point-min) (point-max))))
+  (when-let* ((win (get-buffer-window buf)))
+    (with-selected-window win
+      (with-current-buffer buf
+        (lte--truncate-tables-in-region (point-min) (point-max))))))
 
 ;;;###autoload
 (defun lte-edit-table ()
