@@ -36,7 +36,7 @@
   :group 'lte
   :type '(repeat function))
 
-(defvar-local lte--last-widths '(0 . 0))
+(defvar-local lte--last-width-plist nil)
 
 (define-fringe-bitmap 'lte-right-arrow [128 192 224 240 248 252 254 252 248 240 224 192 128] nil nil 'center)
 
@@ -69,13 +69,18 @@
           (overlay-put ov 'category 'lte-overlay)
           (overlay-put ov 'display '(right-fringe lte-right-arrow))
           (overlay-put ov 'invisible t)
-          (overlay-put ov 'window t)
+          (overlay-put ov 'window (selected-window))
           (overlay-put ov 'evaporate t))
         (forward-line)))))
 
 (defun lte--remove-overlays (start end)
   "Remove all overlays in `lte-overlay' category between START and END."
-  (remove-overlays start end 'category 'lte-overlay))
+  (let ((overlay-list (overlays-in start end))
+        (win (selected-window)))
+    (dolist (ov overlay-list)
+      (when (and (eq (overlay-get ov 'category) 'lte-overlay)
+                 (eq (overlay-get ov 'window) win))
+        (delete-overlay ov)))))
 
 (defun lte--find-tables (start end)
   "Find all tables between START and END."
@@ -103,15 +108,13 @@
       (lte--add-overlays (car table) (cdr table)))))
 
 (defun lte--predisplay-handler (win)
-  "Trigger truncate tables (re-)display in window WIN if `window-body-width' changed."
-  (let ((last-width1 (car lte--last-widths))
-        (last-width2 (cdr lte--last-widths))
-        (new-width (window-body-width win)))
-    (when (and (equal new-width last-width1)
-               (not (equal last-width1 last-width2)))
-      (with-selected-window win
-        (lte--truncate-tables-in-region (window-start) (window-end))))
-    (setq-local lte--last-widths `(,new-width . ,last-width1))))
+  "Trigger truncate tables (re-)display in window WIN if width changed."
+  (with-selected-window win
+    (let ((new-width (window-body-width))
+          (last-width (plist-get lte--last-width-plist win)))
+      (unless (equal new-width last-width)
+        (lte--truncate-tables-in-region (point-min) (point-max))
+        (setq-local lte--last-width-plist (plist-put lte--last-width-plist win new-width))))))
 
 (defun lte--truncate-after-org-indent (buf)
   "Truncate all tables in BUF after org-indent initialisation."
@@ -160,7 +163,7 @@
     (jit-lock-unregister #'lte--truncate-tables-in-region)
     (when (eq major-mode 'org-mode)
       (remove-hook 'org-indent-post-buffer-init-functions #'lte--truncate-after-org-indent))
-    (lte--remove-overlays (point-min) (point-max))))
+    (remove-overlays (point-min) (point-max) 'category 'lte-overlay)))
 
 (provide 'lte)
 
