@@ -36,8 +36,6 @@
   :group 'lte
   :type '(repeat function))
 
-(defvar-local lte--last-width-plist nil)
-
 (define-fringe-bitmap 'lte-right-arrow [128 192 224 240 248 252 254 252 248 240 224 192 128] nil nil 'center)
 
 (require 'org-table)
@@ -105,14 +103,9 @@
       (lte--remove-overlays (car table) (cdr table))
       (lte--add-overlays (car table) (cdr table)))))
 
-(defun lte--predisplay-handler (win)
-  "Trigger truncate tables (re-)display in window WIN if width changed."
-  (with-selected-window win
-    (let ((new-width (window-body-width))
-          (last-width (plist-get lte--last-width-plist win)))
-      (unless (equal new-width last-width)
-        (lte--truncate-tables-in-region (point-min) (point-max))
-        (setq-local lte--last-width-plist (plist-put lte--last-width-plist win new-width))))))
+(defun lte--truncate-tables-in-buffer ()
+  "Trigger truncate all tables in buffer."
+  (lte--truncate-tables-in-region (point-min) (point-max)))
 
 (defun lte--truncate-after-org-indent (buf)
   "Truncate all tables in BUF after org-indent initialisation."
@@ -153,11 +146,11 @@
   :group 'lte
   (if lte-truncate-table-mode
       (progn
-        (add-hook 'pre-redisplay-functions #'lte--predisplay-handler nil t)
+        (add-hook 'window-configuration-change-hook #'lte--truncate-tables-in-buffer nil t)
         (jit-lock-register #'lte--truncate-tables-in-region)
         (when (eq major-mode 'org-mode)
           (add-hook 'org-indent-post-buffer-init-functions #'lte--truncate-after-org-indent nil t)))
-    (remove-hook 'pre-redisplay-functions #'lte--predisplay-handler t)
+    (remove-hook 'window-configuration-change-hook #'lte--truncate-tables-in-buffer t)
     (jit-lock-unregister #'lte--truncate-tables-in-region)
     (when (eq major-mode 'org-mode)
       (remove-hook 'org-indent-post-buffer-init-functions #'lte--truncate-after-org-indent))
