@@ -94,7 +94,7 @@
         (when (funcall table-at-point-p-func)
           (let ((table-begin (funcall table-begin-func))
                 (table-end (funcall table-end-func)))
-            (push (cons table-begin table-end) table-list)
+            (push (cons (max table-begin start) (min table-end end)) table-list)
             (goto-char table-end)))))
     table-list))
 
