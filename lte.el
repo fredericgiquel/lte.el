@@ -6,7 +6,7 @@
 ;; Git-Repository: git://github.com/fredericgiquel/lte.git
 ;; Created: 2024-12-07
 ;; Version: 0.1
-;; Package-Requires: ((emacs "28.1") (org "9.5") (edit-indirect "0.1.13"))
+;; Package-Requires: ((emacs "29.1") (org "9.6") (edit-indirect "0.1.13"))
 
 ;; This file is not part of GNU Emacs.
 
