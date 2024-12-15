@@ -163,6 +163,12 @@
       (remove-hook 'org-indent-post-buffer-init-functions #'lte--truncate-after-org-indent))
     (remove-overlays (point-min) (point-max) 'category 'lte-overlay)))
 
+(defun lte--org-fold-advice (from to flag &rest _)
+  "Advice to truncate tables when an Org entry is unfolded."
+  (when (and lte-truncate-table-mode (not flag))
+    (lte--truncate-tables-in-region from to)))
+(advice-add #'org-fold-core-region :after #'lte--org-fold-advice)
+
 (provide 'lte)
 
 ;;; lte.el ends here
