@@ -50,28 +50,26 @@
   "Call PARENT-BUFFER major-mode."
   (funcall (with-current-buffer parent-buffer major-mode)))
 
-(defun lte--get-visual-line-width ()
-  "Return visual line width."
+(defun lte--visual-line-end-position ()
+  "Return end position of current visual line."
   (let ((word-wrap nil))
-    (- (save-excursion (end-of-visual-line) (point))
-       (save-excursion (beginning-of-visual-line) (point)))))
+    (save-excursion (end-of-visual-line) (point))))
 
 (defun lte--add-overlays (start end)
   "Add overlays to truncate large table between START and END."
   (save-excursion
     (goto-char start)
-    (let ((visual-line-width (lte--get-visual-line-width)))
-      (while (< (point) end)
-        (when-let* ((begin-hidden (+ (line-beginning-position) visual-line-width))
-                    (end-hidden (line-end-position))
-                    (large-p (> end-hidden begin-hidden))
-                    (ov (make-overlay (- begin-hidden 1) end-hidden)))
-          (overlay-put ov 'category 'lte-overlay)
-          (overlay-put ov 'display '(right-fringe lte-right-arrow))
-          (overlay-put ov 'invisible t)
-          (overlay-put ov 'window (selected-window))
-          (overlay-put ov 'evaporate t))
-        (forward-line)))))
+    (while (< (point) end)
+      (when-let* ((begin-hidden (lte--visual-line-end-position))
+                  (end-hidden (line-end-position))
+                  (large-p (> end-hidden begin-hidden))
+                  (ov (make-overlay (- begin-hidden 1) end-hidden)))
+        (overlay-put ov 'category 'lte-overlay)
+        (overlay-put ov 'display '(right-fringe lte-right-arrow))
+        (overlay-put ov 'invisible t)
+        (overlay-put ov 'window (selected-window))
+        (overlay-put ov 'evaporate t))
+      (forward-line))))
 
 (defun lte--remove-overlays (start end)
   "Remove all overlays in `lte-overlay' category between START and END."
