@@ -147,10 +147,12 @@
   (if lte-truncate-table-mode
       (progn
         (add-hook 'window-configuration-change-hook #'lte--truncate-tables-in-buffer nil t)
+        (add-hook 'text-scale-mode-hook #'lte--truncate-tables-in-buffer nil t)
         (jit-lock-register #'lte--truncate-tables-in-region)
         (when (eq major-mode 'org-mode)
           (add-hook 'org-indent-post-buffer-init-functions #'lte--truncate-after-org-indent nil t)))
     (remove-hook 'window-configuration-change-hook #'lte--truncate-tables-in-buffer t)
+    (remove-hook 'text-scale-mode-hook #'lte--truncate-tables-in-buffer t)
     (jit-lock-unregister #'lte--truncate-tables-in-region)
     (when (eq major-mode 'org-mode)
       (remove-hook 'org-indent-post-buffer-init-functions #'lte--truncate-after-org-indent))
