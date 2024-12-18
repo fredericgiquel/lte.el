@@ -36,7 +36,7 @@
   :group 'lte
   :type '(repeat function))
 
-(define-fringe-bitmap 'lte-right-arrow [128 192 224 240 248 252 254 252 248 240 224 192 128] nil nil 'center)
+(define-fringe-bitmap 'lte-dots [0 0 0 0 0 0 0 0 0 0 0 219 219] nil nil 'center)
 
 (require 'org-table)
 (defalias 'lte--org-table-at-point-p 'org-at-table-p)
@@ -63,7 +63,7 @@
                   (large-p (> end-hidden begin-hidden))
                   (ov (make-overlay (- begin-hidden 1) end-hidden)))
         (overlay-put ov 'category 'lte-overlay)
-        (overlay-put ov 'display '(right-fringe lte-right-arrow))
+        (overlay-put ov 'display '(right-fringe lte-dots))
         (overlay-put ov 'invisible t)
         (overlay-put ov 'window (selected-window))
         (overlay-put ov 'evaporate t))
