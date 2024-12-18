@@ -36,6 +36,12 @@
   :group 'lte
   :type '(repeat function))
 
+(defcustom lte-truncate-table-extra-hidden-chars 1
+  "Number of additonnal hidden characters required to truncate tables.
+Can be useful for some edge cases."
+  :group 'lte
+  :type 'integer)
+
 (define-fringe-bitmap 'lte-dots [0 0 0 0 0 0 0 0 0 0 0 219 219] nil nil 'center)
 
 (require 'org-table)
@@ -61,7 +67,7 @@
       (when-let* ((begin-hidden (lte--visual-line-end-position))
                   (end-hidden (line-end-position))
                   (large-p (> end-hidden begin-hidden))
-                  (ov (make-overlay (- begin-hidden 1) end-hidden)))
+                  (ov (make-overlay (- begin-hidden lte-truncate-table-extra-hidden-chars) end-hidden)))
         (overlay-put ov 'category 'lte-overlay)
         (overlay-put ov 'display '(right-fringe lte-dots))
         (overlay-put ov 'invisible t)
