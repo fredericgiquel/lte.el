@@ -2,9 +2,8 @@
 
 ;; Copyright (C) 2024 Frédéric Giquel
 ;; Author: Frédéric Giquel <frederic.giquel@laposte.net>
-;; URL: http://github.com/fredericgiquel/lte
-;; Git-Repository: git://github.com/fredericgiquel/lte.git
-;; Created: 2024-12-07
+;; URL: http://github.com/fredericgiquel/lte.el
+;; Git-Repository: git://github.com/fredericgiquel/lte.el.git
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "29.1") (org "9.6") (edit-indirect "0.1.13"))
 
