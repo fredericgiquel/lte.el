@@ -31,7 +31,7 @@
 ;;; Code:
 (require 'edit-indirect)
 
-(defcustom lte-indirect-buffer-disable-minor-mode-list '(visual-line-mode visual-fill-column-mode olivetti-mode)
+(defcustom lte-indirect-buffer-disable-minor-mode-list '(visual-line-mode visual-fill-column-mode olivetti-mode org-indent-mode)
   "List of minor modes to be disabled in indirect buffer used to edit large table."
   :group 'lte
   :type '(repeat function))
