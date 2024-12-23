@@ -31,7 +31,7 @@
 (require 'edit-indirect)
 
 (defcustom lte-indirect-buffer-disable-minor-mode-list '(visual-line-mode visual-fill-column-mode olivetti-mode org-indent-mode)
-  "List of minor modes to be disabled in indirect buffer used to edit large table."
+  "List of minor modes to disable in indirect buffer used to edit large table."
   :group 'lte
   :type '(repeat function))
 
@@ -52,7 +52,7 @@
   (let ((truncate-lines t))
     (save-excursion (end-of-visual-line) (point))))
 
-(defun lte--add-overlays (start end)
+(defun lte--add-truncate-table-overlays (start end)
   "Add overlays to truncate large table between START and END."
   (save-excursion
     (goto-char start)
@@ -68,8 +68,8 @@
         (overlay-put ov 'evaporate t))
       (forward-line))))
 
-(defun lte--remove-overlays (start end)
-  "Remove all overlays in `lte-overlay' category between START and END."
+(defun lte--remove-truncate-table-overlays (start end)
+  "Remove all overlays used to truncate table between START and END."
   (let ((overlay-list (overlays-in start end))
         (win (selected-window)))
     (dolist (ov overlay-list)
@@ -99,11 +99,11 @@
   "Truncate all tables between START and END."
   (let ((table-list (lte--find-tables start end)))
     (dolist (table table-list)
-      (lte--remove-overlays (car table) (cdr table))
-      (lte--add-overlays (car table) (cdr table)))))
+      (lte--remove-truncate-table-overlays (car table) (cdr table))
+      (lte--add-truncate-table-overlays (car table) (cdr table)))))
 
 (defun lte--truncate-tables-in-buffer ()
-  "Trigger truncate all tables in buffer."
+  "Truncate all tables in current buffer."
   (lte--truncate-tables-in-region (point-min) (point-max)))
 
 (defun lte--truncate-after-org-indent (buf)
@@ -140,7 +140,7 @@
 
 ;;;###autoload
 (define-minor-mode lte-truncate-table-mode
-  "Minor mode that automatically truncate tables larger than window width."
+  "Minor mode that truncate Org or Markdown tables larger than window body width."
   :lighter " LTE"
   :group 'lte
   (if lte-truncate-table-mode
@@ -158,7 +158,9 @@
     (remove-overlays (point-min) (point-max) 'category 'lte-overlay)))
 
 (defun lte--org-fold-advice (from to flag &rest _)
-  "Advice to truncate tables when an Org entry is unfolded."
+  "Advice for `org-fold-core-region'.
+Truncate tables between FROM and TO when `lte-truncate-table-mode' is
+enabled and FLAG is nil (unfold action)."
   (when (and lte-truncate-table-mode (not flag))
     (lte--truncate-tables-in-region from to)))
 (advice-add #'org-fold-core-region :after #'lte--org-fold-advice)
