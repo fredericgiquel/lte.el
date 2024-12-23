@@ -35,12 +35,6 @@
   :group 'lte
   :type '(repeat function))
 
-(defcustom lte-truncate-table-extra-hidden-chars 1
-  "Number of additonnal hidden characters required to truncate tables.
-Can be useful for some edge cases."
-  :group 'lte
-  :type 'integer)
-
 (define-fringe-bitmap 'lte-dots [0 0 0 0 0 0 0 0 0 0 0 219 219] nil nil 'center)
 
 (require 'org-table)
@@ -55,7 +49,7 @@ Can be useful for some edge cases."
 
 (defun lte--visual-line-end-position ()
   "Return end position of current visual line."
-  (let ((word-wrap nil))
+  (let ((truncate-lines t))
     (save-excursion (end-of-visual-line) (point))))
 
 (defun lte--add-overlays (start end)
@@ -63,10 +57,10 @@ Can be useful for some edge cases."
   (save-excursion
     (goto-char start)
     (while (< (point) end)
-      (when-let* ((begin-hidden (lte--visual-line-end-position))
-                  (end-hidden (line-end-position))
-                  (large-p (> end-hidden begin-hidden))
-                  (ov (make-overlay (- begin-hidden lte-truncate-table-extra-hidden-chars) end-hidden)))
+      (when-let* ((visual-line-end (lte--visual-line-end-position))
+                  (line-end (line-end-position))
+                  (truncate-p (> line-end visual-line-end))
+                  (ov (make-overlay (- visual-line-end 1) line-end)))
         (overlay-put ov 'category 'lte-overlay)
         (overlay-put ov 'display '(right-fringe lte-dots))
         (overlay-put ov 'invisible t)
