@@ -39,8 +39,9 @@
 
 (define-fringe-bitmap 'lte-dots [0 0 0 0 0 0 0 0 0 0 0 219 219] nil nil 'center)
 
-(defalias 'lte--org-table-at-point-p 'org-at-table-p)
-(defalias 'lte--markdown-table-at-point-p 'markdown-table-at-point-p)
+(defvar lte--table-properties-by-mode
+  '(org-mode (:at-point org-at-table-p :begin org-table-begin :end org-table-end :regexp "^[ \t]*|")
+    markdown-mode (:at-point markdown-table-at-point-p :begin markdown-table-begin :end markdown-table-end :regexp "^[ \t]*|")))
 
 (defun lte--inherit-parent-major-mode (parent-buffer _beg _end)
   "Call PARENT-BUFFER major-mode."
@@ -78,18 +79,15 @@
 
 (defun lte--find-tables (start end)
   "Find all tables between START and END."
-  (let* ((short-mode-name (string-trim-right (symbol-name major-mode) "-mode"))
-         (table-at-point-p-func (intern (concat "lte--" short-mode-name "-table-at-point-p")))
-         (table-begin-func (intern (concat short-mode-name "-table-begin")))
-         (table-end-func (intern (concat short-mode-name "-table-end")))
+  (let* ((table-properties (plist-get lte--table-properties-by-mode major-mode))
          (table-list nil))
     (save-excursion
       (goto-char start)
       (while (and (< (point) end)
-                  (re-search-forward "^[ \t]*|" end t))
-        (when (funcall table-at-point-p-func)
-          (let ((table-begin (funcall table-begin-func))
-                (table-end (funcall table-end-func)))
+                  (re-search-forward (plist-get table-properties :regexp) end t))
+        (when (funcall (plist-get table-properties :at-point))
+          (let ((table-begin (funcall (plist-get table-properties :begin)))
+                (table-end (funcall (plist-get table-properties :end))))
             (push (cons (max table-begin start) (min table-end end)) table-list)
             (goto-char table-end)))))
     table-list))
@@ -116,13 +114,10 @@
   (interactive)
   (if (or (eq major-mode 'org-mode)
           (eq major-mode 'markdown-mode))
-      (let* ((short-mode-name (string-trim-right (symbol-name major-mode) "-mode"))
-             (table-at-point-p-func (intern (concat "lte--" short-mode-name "-table-at-point-p")))
-             (table-begin-func (intern (concat short-mode-name "-table-begin")))
-             (table-end-func (intern (concat short-mode-name "-table-end"))))
-        (if (funcall table-at-point-p-func)
-            (let* ((begin (funcall table-begin-func))
-                   (end (funcall table-end-func))
+      (let ((table-properties (plist-get lte--table-properties-by-mode major-mode)))
+        (if (funcall (plist-get table-properties :at-point))
+            (let* ((begin (funcall (plist-get table-properties :begin)))
+                   (end (funcall (plist-get table-properties :end)))
                    (relative-point (- (point) begin))
                    (edit-indirect-guess-mode-function 'lte--inherit-parent-major-mode)
                    (indirect-buf (edit-indirect-region begin end 'display-buffer)))
