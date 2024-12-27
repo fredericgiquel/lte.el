@@ -106,6 +106,11 @@
   "Truncate all tables in current buffer."
   (lte--truncate-tables-in-region (point-min) (point-max)))
 
+(defun lte--truncate-tables-in-org-entry ()
+  "Truncate all tables in current Org entry (only when org-indent is enabled)."
+  (when (bound-and-true-p org-indent-mode)
+    (lte--truncate-tables-in-region (org-entry-beginning-position) (org-entry-end-position))))
+
 (defun lte--truncate-after-org-indent (buf)
   "Truncate all tables in BUF after org-indent initialisation."
   (when-let* ((win (get-buffer-window buf)))
@@ -149,11 +154,15 @@
         (add-hook 'text-scale-mode-hook #'lte--truncate-tables-in-buffer nil t)
         (jit-lock-register #'lte--truncate-tables-in-region)
         (when (eq major-mode 'org-mode)
+          (add-hook 'org-after-promote-entry-hook #'lte--truncate-tables-in-org-entry nil t)
+          (add-hook 'org-after-demote-entry-hook #'lte--truncate-tables-in-org-entry nil t)
           (add-hook 'org-indent-post-buffer-init-functions #'lte--truncate-after-org-indent nil t)))
     (remove-hook 'window-configuration-change-hook #'lte--truncate-tables-in-buffer t)
     (remove-hook 'text-scale-mode-hook #'lte--truncate-tables-in-buffer t)
     (jit-lock-unregister #'lte--truncate-tables-in-region)
     (when (eq major-mode 'org-mode)
+      (remove-hook 'org-after-promote-entry-hook #'lte--truncate-tables-in-org-entry t)
+      (remove-hook 'org-after-demote-entry-hook #'lte--truncate-tables-in-org-entry t)
       (remove-hook 'org-indent-post-buffer-init-functions #'lte--truncate-after-org-indent))
     (remove-overlays (point-min) (point-max) 'category 'lte-overlay)))
 
