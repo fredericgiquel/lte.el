@@ -111,13 +111,6 @@
   (when (bound-and-true-p org-indent-mode)
     (lte--truncate-tables-in-region (org-entry-beginning-position) (org-entry-end-position))))
 
-(defun lte--truncate-after-org-indent (buf)
-  "Truncate all tables in BUF after org-indent initialisation."
-  (when-let* ((win (get-buffer-window buf)))
-    (with-selected-window win
-      (with-current-buffer buf
-        (lte--truncate-tables-in-region (point-min) (point-max))))))
-
 ;;;###autoload
 (defun lte-edit-table ()
   "Edit Org or Markdown table in an indirect buffer."
@@ -165,6 +158,14 @@
       (remove-hook 'org-after-demote-entry-hook #'lte--truncate-tables-in-org-entry t)
       (remove-hook 'org-indent-post-buffer-init-functions #'lte--truncate-after-org-indent))
     (remove-overlays (point-min) (point-max) 'category 'lte-overlay)))
+
+(defun lte--truncate-after-org-indent (buf)
+  "Truncate all tables in BUF after org-indent initialisation."
+  (when-let* ((lte-truncate-mode-enabled-p lte-truncate-table-mode)
+              (win (get-buffer-window buf)))
+    (with-selected-window win
+      (with-current-buffer buf
+        (lte--truncate-tables-in-region (point-min) (point-max))))))
 
 (defun lte--org-fold-advice (from to flag &rest _)
   "Advice for `org-fold-core-region'.
