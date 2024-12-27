@@ -113,7 +113,7 @@
 
 ;;;###autoload
 (defun lte-edit-table ()
-  "Edit Org or Markdown table in an indirect buffer."
+  "Edit Org or Markdown table at point in an indirect buffer."
   (interactive)
   (if (or (eq major-mode 'org-mode)
           (eq major-mode 'markdown-mode))
