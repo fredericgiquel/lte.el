@@ -29,6 +29,8 @@
 
 ;;; Code:
 (require 'edit-indirect)
+(require 'org)
+(require 'markdown-mode nil t)
 
 (defcustom lte-indirect-buffer-disable-minor-mode-list '(visual-line-mode visual-fill-column-mode olivetti-mode)
   "List of minor modes to disable in indirect buffer used to edit large table."
@@ -37,10 +39,7 @@
 
 (define-fringe-bitmap 'lte-dots [0 0 0 0 0 0 0 0 0 0 0 219 219] nil nil 'center)
 
-(require 'org-table)
 (defalias 'lte--org-table-at-point-p 'org-at-table-p)
-
-(require 'markdown-mode nil t)
 (defalias 'lte--markdown-table-at-point-p 'markdown-table-at-point-p)
 
 (defun lte--inherit-parent-major-mode (parent-buffer _beg _end)
