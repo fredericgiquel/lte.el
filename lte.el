@@ -128,7 +128,7 @@
 
 ;;;###autoload
 (define-minor-mode lte-truncate-table-mode
-  "Minor mode that truncate Org or Markdown tables larger than window body width."
+  "Minor mode that truncates Org or Markdown tables larger than window body width."
   :lighter " LTE"
   :group 'lte
   (if lte-truncate-table-mode
