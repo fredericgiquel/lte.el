@@ -30,6 +30,7 @@
 ;;; Code:
 (require 'edit-indirect)
 (require 'org)
+(require 'org-indent)
 (require 'markdown-mode nil t)
 
 (defcustom lte-indirect-buffer-disable-minor-mode-list '(visual-line-mode visual-fill-column-mode olivetti-mode)
@@ -103,11 +104,6 @@
   "Truncate all tables in current buffer."
   (lte--truncate-tables-in-region (point-min) (point-max)))
 
-(defun lte--truncate-tables-in-org-entry ()
-  "Truncate all tables in current Org entry (only when org-indent is enabled)."
-  (when (bound-and-true-p org-indent-mode)
-    (lte--truncate-tables-in-region (org-entry-beginning-position) (org-entry-end-position))))
-
 ;;;###autoload
 (defun lte-edit-table ()
   "Edit Org or Markdown table at point in an indirect buffer."
@@ -139,27 +135,11 @@
       (progn
         (add-hook 'window-configuration-change-hook #'lte--truncate-tables-in-buffer nil t)
         (add-hook 'text-scale-mode-hook #'lte--truncate-tables-in-buffer nil t)
-        (jit-lock-register #'lte--truncate-tables-in-region)
-        (when (eq major-mode 'org-mode)
-          (add-hook 'org-after-promote-entry-hook #'lte--truncate-tables-in-org-entry nil t)
-          (add-hook 'org-after-demote-entry-hook #'lte--truncate-tables-in-org-entry nil t)
-          (add-hook 'org-indent-post-buffer-init-functions #'lte--truncate-after-org-indent nil t)))
+        (jit-lock-register #'lte--truncate-tables-in-region))
     (remove-hook 'window-configuration-change-hook #'lte--truncate-tables-in-buffer t)
     (remove-hook 'text-scale-mode-hook #'lte--truncate-tables-in-buffer t)
     (jit-lock-unregister #'lte--truncate-tables-in-region)
-    (when (eq major-mode 'org-mode)
-      (remove-hook 'org-after-promote-entry-hook #'lte--truncate-tables-in-org-entry t)
-      (remove-hook 'org-after-demote-entry-hook #'lte--truncate-tables-in-org-entry t)
-      (remove-hook 'org-indent-post-buffer-init-functions #'lte--truncate-after-org-indent))
     (remove-overlays (point-min) (point-max) 'category 'lte-overlay)))
-
-(defun lte--truncate-after-org-indent (buf)
-  "Truncate all tables in BUF after org-indent initialisation."
-  (when-let* ((lte-truncate-mode-enabled-p lte-truncate-table-mode)
-              (win (get-buffer-window buf)))
-    (with-selected-window win
-      (with-current-buffer buf
-        (lte--truncate-tables-in-region (point-min) (point-max))))))
 
 (defun lte--org-fold-advice (from to flag &rest _)
   "Advice for `org-fold-core-region'.
@@ -168,6 +148,14 @@ enabled and FLAG is nil (unfold action)."
   (when (and lte-truncate-table-mode (not flag))
     (lte--truncate-tables-in-region from to)))
 (advice-add #'org-fold-core-region :after #'lte--org-fold-advice)
+
+(defun lte--org-indent-advice (beg end &rest _)
+  "Advice for `org-indent-add-properties'.
+Truncate tables between BEG and END when `lte-truncate-table-mode' is
+enabled."
+  (when lte-truncate-table-mode
+    (lte--truncate-tables-in-region beg end)))
+(advice-add #'org-indent-add-properties :after #'lte--org-indent-advice)
 
 (provide 'lte)
 
