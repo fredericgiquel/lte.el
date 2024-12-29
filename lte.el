@@ -4,7 +4,7 @@
 ;; Author: Frédéric Giquel <frederic.giquel@laposte.net>
 ;; URL: http://github.com/fredericgiquel/lte.el
 ;; Git-Repository: git://github.com/fredericgiquel/lte.el.git
-;; Version: 0.1
+;; Version: 0.2
 ;; Package-Requires: ((emacs "29.1") (org "9.6") (edit-indirect "0.1.13"))
 
 ;; This file is not part of GNU Emacs.
