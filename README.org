@@ -1,0 +1,48 @@
+#+title: lte.el - Large Table Edition for Emacs
+#+author: Frédéric Giquel
+#+language: en
+
+LTE provides facilities for editing large Org or Markdown table when line-wrapping is enabled (=truncate-lines= is nil).
+
+* Features
+
+- Provides a minor-mode (=lte-truncate-table-mode=) that truncates table larger than window width
+  - Only show the left part of the table (without horizontal scrolling)
+  - The visible part of table remains editable in place
+  - Automatically adapt truncation when window is resized or font is scaled
+  - Compatible with =org-indent=
+- Provides a command (=lte-edit-table=) to open the table at point in an indirect buffer with line-wrapping disabled: useful to see or edit the right part of the table
+
+* Screenshot
+
+[[./example.gif]]
+
+* Installation
+
+** Prerequisites
+
+ - Emacs 29.1 or later
+ - Org 9.6 or later
+ - =edit-indirect= package
+ - (optional) =markdown-mode= package
+
+** Manual Installation
+
+- Clone this repository:
+
+#+begin_src sh
+git clone https://github.com/fredericgiquel/lte.el.git
+#+end_src
+
+- Add the following to your Emacs configuration:
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path "/path/to/lte.el/directory")
+(require 'lte)
+(add-hook 'org-mode-hook #'lte-truncate-table-mode)
+(add-hook 'markdown-mode-hook #'lte-truncate-table-mode)
+#+end_src
+
+* Customization
+
+The option =lte-indirect-buffer-disable-minor-mode-list= lets you customize the minor modes that should be disabled in indirect buffer used to edit table. All modes that enables line-wrapping and are automatically enabled in Org or Markdown buffers must be added to this list.
