@@ -1,6 +1,6 @@
 ;;; lte.el --- Large table edition -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2024 Frédéric Giquel
+;; Copyright (C) 2024-2025 Frédéric Giquel
 ;; Author: Frédéric Giquel <frederic.giquel@laposte.net>
 ;; URL: http://github.com/fredericgiquel/lte.el
 ;; Git-Repository: git://github.com/fredericgiquel/lte.el.git
