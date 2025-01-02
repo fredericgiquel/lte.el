@@ -1,4 +1,4 @@
-#+title: lte.el - Large Table Edition for Emacs
+#+title: lte.el - Large Table Edition in Org and Markdown buffers
 #+author: Frédéric Giquel
 #+language: en
 
@@ -11,7 +11,7 @@ LTE provides facilities for editing large Org or Markdown table when line-wrappi
   - The visible part of table remains editable in place
   - Automatically adapt truncation when window is resized or font is scaled
   - Compatible with =org-indent=
-- Provides a command (=lte-edit-table=) to open the table at point in an indirect buffer with line-wrapping disabled: useful to see or edit the right part of the table
+- Provides a command (=lte-edit-table=) to open the table at point in an indirect buffer with line-wrapping disabled: useful to see or edit the hidden part of the table
 
 * Screenshot
 
@@ -40,6 +40,7 @@ git clone https://github.com/fredericgiquel/lte.el.git
 (add-to-list 'load-path "/path/to/lte.el/directory")
 (require 'lte)
 (add-hook 'org-mode-hook #'lte-truncate-table-mode)
+;; If markdown package is installed
 (add-hook 'markdown-mode-hook #'lte-truncate-table-mode)
 #+end_src
 

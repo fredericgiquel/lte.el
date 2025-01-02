@@ -1,4 +1,4 @@
-;;; lte.el --- Large table edition -*- lexical-binding: t; -*-
+;;; lte.el --- Large Table Edition in Org and Markdwon buffers -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2024-2025 Frédéric Giquel
 ;; Author: Frédéric Giquel <frederic.giquel@laposte.net>
@@ -25,7 +25,15 @@
 
 ;;; Commentary:
 
-;; Offers facilities to display and edit large table in Org and Markdown buffer.
+;; Provides facilities to display and edit large table in Org and Markdown
+;; buffers when line-wrapping is enabled:
+;; - a minor-mode (lte-truncate-table-mode) that truncates table larger than
+;;   window width
+;; - a command (lte-edit-table) to open the table at point in an indirect buffer
+;;   with line-wrapping disabled
+;;
+;; Full documentation here:
+;;   https://github.com/fredericgiquel/lte.el/blob/main/README.org
 
 ;;; Code:
 (require 'edit-indirect)
