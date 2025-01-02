@@ -71,7 +71,7 @@
                   (truncate-p (> line-end visual-line-end))
                   (ov (make-overlay (- visual-line-end 1) line-end)))
         (overlay-put ov 'category 'lte-overlay)
-        (overlay-put ov 'display '(right-fringe lte-dots))
+        (overlay-put ov 'display (if (display-graphic-p) '(right-fringe lte-dots) '(right-margin "…")))
         (overlay-put ov 'invisible t)
         (overlay-put ov 'window (selected-window))
         (overlay-put ov 'evaporate t))
