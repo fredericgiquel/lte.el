@@ -88,18 +88,19 @@
 
 (defun lte--find-tables (start end)
   "Find all tables between START and END."
-  (let* ((table-properties (plist-get lte--table-properties-by-mode major-mode))
-         (table-list nil))
-    (save-excursion
-      (goto-char start)
-      (while (and (< (point) end)
-                  (re-search-forward (plist-get table-properties :regexp) end t))
-        (when (funcall (plist-get table-properties :at-point))
-          (let ((table-begin (funcall (plist-get table-properties :begin)))
-                (table-end (funcall (plist-get table-properties :end))))
-            (push (cons (max table-begin start) (min table-end end)) table-list)
-            (goto-char table-end)))))
-    table-list))
+  (when-let* ((mode (derived-mode-p 'org-mode 'markdown-mode))
+              (table-properties (plist-get lte--table-properties-by-mode mode)))
+    (let ((table-list nil))
+      (save-excursion
+        (goto-char start)
+        (while (and (< (point) end)
+                    (re-search-forward (plist-get table-properties :regexp) end t))
+          (when (funcall (plist-get table-properties :at-point))
+            (let ((table-begin (funcall (plist-get table-properties :begin)))
+                  (table-end (funcall (plist-get table-properties :end))))
+              (push (cons (max table-begin start) (min table-end end)) table-list)
+              (goto-char table-end)))))
+      table-list)))
 
 (defun lte--truncate-tables-in-region (start end)
   "Truncate all tables between START and END."
