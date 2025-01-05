@@ -73,14 +73,14 @@
         (overlay-put ov 'category 'lte-overlay)
         (overlay-put ov 'display (if (display-graphic-p) '(right-fringe lte-dots) '(right-margin "…")))
         (overlay-put ov 'invisible t)
-        (overlay-put ov 'window (selected-window))
+        (overlay-put ov 'window (get-buffer-window))
         (overlay-put ov 'evaporate t))
       (forward-line))))
 
 (defun lte--remove-truncate-table-overlays (start end)
   "Remove all overlays used to truncate table between START and END."
   (let ((overlay-list (overlays-in start end))
-        (win (selected-window)))
+        (win (get-buffer-window)))
     (dolist (ov overlay-list)
       (when (and (eq (overlay-get ov 'category) 'lte-overlay)
                  (eq (overlay-get ov 'window) win))
@@ -178,7 +178,7 @@ enabled and FLAG is nil (unfold action)."
   "Advice for `org-indent-add-properties'.
 Truncate tables between BEG and END when `lte-truncate-table-mode' is
 enabled."
-  (when lte-truncate-table-mode
+  (when (and lte-truncate-table-mode (get-buffer-window))
     (lte--truncate-tables-in-region beg end)))
 (advice-add #'org-indent-add-properties :after #'lte--org-indent-advice)
 
