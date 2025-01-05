@@ -114,16 +114,13 @@
 
 (defvar-local lte--line-numbers-display-width-by-win nil)
 (defun lte--handle-line-numbers-display-width-change (win)
-  "Adjust overlays in window WIN if `line-number-display-width' changed."
+  "Refresh overlays in window WIN if `line-number-display-width' changed."
   (with-selected-window win
     (when display-line-numbers
       (let ((current-width (line-number-display-width))
-            (saved-width (or (plist-get lte--line-numbers-display-width-by-win win) 0)))
-        (unless (equal current-width saved-width)
-          (dolist (ov (overlays-in (point-min) (point-max)))
-            (when (and (eq (overlay-get ov 'category) 'lte-overlay)
-                       (eq (overlay-get ov 'window) win))
-              (move-overlay ov (- (overlay-start ov) (- current-width saved-width)) (overlay-end ov))))
+            (saved-width (plist-get lte--line-numbers-display-width-by-win win)))
+        (unless (eq current-width saved-width)
+          (lte--truncate-tables-in-buffer)
           (setq-local lte--line-numbers-display-width-by-win
                       (plist-put lte--line-numbers-display-width-by-win win current-width)))))))
 
