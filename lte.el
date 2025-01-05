@@ -156,7 +156,9 @@
         (add-hook 'window-configuration-change-hook #'lte--truncate-tables-in-buffer nil t)
         (add-hook 'text-scale-mode-hook #'lte--truncate-tables-in-buffer nil t)
         (add-hook 'pre-redisplay-functions #'lte--handle-line-numbers-display-width-change nil t)
-        (jit-lock-register #'lte--truncate-tables-in-region))
+        (jit-lock-register #'lte--truncate-tables-in-region)
+        (advice-add #'org-fold-core-region :after #'lte--org-fold-advice)
+        (advice-add #'org-indent-add-properties :after #'lte--org-indent-advice))
     (remove-hook 'window-configuration-change-hook #'lte--truncate-tables-in-buffer t)
     (remove-hook 'text-scale-mode-hook #'lte--truncate-tables-in-buffer t)
     (remove-hook 'pre-redisplay-functions #'lte--handle-line-numbers-display-width-change t)
@@ -169,7 +171,6 @@ Truncate tables between FROM and TO when `lte-truncate-table-mode' is
 enabled and FLAG is nil (unfold action)."
   (when (and lte-truncate-table-mode (not flag))
     (lte--truncate-tables-in-region from to)))
-(advice-add #'org-fold-core-region :after #'lte--org-fold-advice)
 
 (defun lte--org-indent-advice (beg end &rest _)
   "Advice for `org-indent-add-properties'.
@@ -177,7 +178,6 @@ Truncate tables between BEG and END when `lte-truncate-table-mode' is
 enabled."
   (when (and lte-truncate-table-mode (get-buffer-window))
     (lte--truncate-tables-in-region beg end)))
-(advice-add #'org-indent-add-properties :after #'lte--org-indent-advice)
 
 (provide 'lte)
 
