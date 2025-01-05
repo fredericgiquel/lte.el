@@ -112,6 +112,21 @@
   "Truncate all tables in current buffer."
   (lte--truncate-tables-in-region (point-min) (point-max)))
 
+(defvar-local lte--line-numbers-display-width-by-win nil)
+(defun lte--handle-line-numbers-display-width-change (win)
+  "Adjust overlays in window WIN if `line-number-display-width' changed."
+  (with-selected-window win
+    (when display-line-numbers
+      (let ((current-width (line-number-display-width))
+            (saved-width (or (plist-get lte--line-numbers-display-width-by-win win) 0)))
+        (unless (equal current-width saved-width)
+          (dolist (ov (overlays-in (point-min) (point-max)))
+            (when (and (eq (overlay-get ov 'category) 'lte-overlay)
+                       (eq (overlay-get ov 'window) win))
+              (move-overlay ov (- (overlay-start ov) (- current-width saved-width)) (overlay-end ov))))
+          (setq-local lte--line-numbers-display-width-by-win
+                      (plist-put lte--line-numbers-display-width-by-win win current-width)))))))
+
 ;;;###autoload
 (defun lte-edit-table ()
   "Edit Org or Markdown table at point in an indirect buffer."
@@ -143,9 +158,11 @@
       (progn
         (add-hook 'window-configuration-change-hook #'lte--truncate-tables-in-buffer nil t)
         (add-hook 'text-scale-mode-hook #'lte--truncate-tables-in-buffer nil t)
+        (add-hook 'pre-redisplay-functions #'lte--handle-line-numbers-display-width-change nil t)
         (jit-lock-register #'lte--truncate-tables-in-region))
     (remove-hook 'window-configuration-change-hook #'lte--truncate-tables-in-buffer t)
     (remove-hook 'text-scale-mode-hook #'lte--truncate-tables-in-buffer t)
+    (remove-hook 'pre-redisplay-functions #'lte--handle-line-numbers-display-width-change t)
     (jit-lock-unregister #'lte--truncate-tables-in-region)
     (remove-overlays (point-min) (point-max) 'category 'lte-overlay)))
 

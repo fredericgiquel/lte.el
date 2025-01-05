@@ -11,6 +11,7 @@ LTE provides facilities for editing large Org or Markdown table when line-wrappi
   - The visible part of table remains editable in place
   - Automatically adapt truncation when window is resized or font is scaled
   - Compatible with =org-indent=
+  - Compatible with =display-line-numbers=
 - Provides a command (=lte-edit-table=) to open the table at point in an indirect buffer with line-wrapping disabled: useful to see or edit the hidden part of the table
 
 * Screenshot
