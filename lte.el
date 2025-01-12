@@ -1,4 +1,4 @@
-;;; lte.el --- Large Table Edition in Org and Markdwon buffers -*- lexical-binding: t; -*-
+;;; lte.el --- Large Table Edition in Org and Markdown buffers -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2024-2025 Frédéric Giquel
 ;; Author: Frédéric Giquel <frederic.giquel@laposte.net>
