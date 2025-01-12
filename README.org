@@ -2,6 +2,8 @@
 #+author: Frédéric Giquel
 #+language: en
 
+[[https://melpa.org/#/lte][file:https://melpa.org/packages/lte-badge.svg]]
+
 LTE provides facilities for editing large Org or Markdown table when line-wrapping is enabled (=truncate-lines= is nil).
 
 * Features
