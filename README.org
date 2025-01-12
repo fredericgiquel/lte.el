@@ -27,6 +27,13 @@ LTE provides facilities for editing large Org or Markdown table when line-wrappi
  - =edit-indirect= package
  - (optional) =markdown-mode= package
 
+** MELPA
+
+#+begin_src emacs-lisp
+(use-package lte
+  :hook ((org-mode markdown-mode) . lte-truncate-table-mode))
+#+end_src
+
 ** Manual Installation
 
 - Clone this repository:
